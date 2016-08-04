@@ -2,13 +2,8 @@ var express = require('express'),
     users = require('./routes/users');
 var app = express();
 
-var testData = {
-    user: 'xiaobao',
-    message: 'welcome to this system'
-};
-
 //加载模板引擎ejs
-app.set('views', './views');
+app.set('views', ['./views']);
 app.set('view engine', 'ejs');
 
 //静态文件处理
@@ -18,7 +13,10 @@ app.use('/static', express.static('./public'));
 app.use('/user', users);
 
 app.get('/', function(req, res) {
-    res.render('index', testData);
+    res.render('index', {
+        user: 'xiaobao',
+        message: 'welcome to this system'
+    });
 });
 
 app.listen(3000, function() {
