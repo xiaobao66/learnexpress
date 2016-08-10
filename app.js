@@ -8,12 +8,10 @@ var globalScriptContent = [];
 var globalRandoms = [];
 
 function getMozEcName(weburl, number, callback) {
-    console.log(weburl);
     proxy.getProxy(weburl, function(data) {
         var evalContent = data.match(/eval\((.*)\)/)[1];
         eval("globalScriptContent[" + number + "]= " + evalContent + ";");
         var mozEcName = globalScriptContent[number].match(/document\.mozEcName\.push\(.*?\)/ig);
-        console.log(mozEcName);
         for (var i = 0; i < mozEcName.length; i++) {
             globalRandoms.push(mozEcName[i].match(/document\.mozEcName\.push\((.*)\)/i)[1]);
         }
