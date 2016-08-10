@@ -1,6 +1,6 @@
 var express = require('express'),
-    url = require('url');
-users = require('./routes/users'),
+    url = require('url'),
+    users = require('./routes/users'),
     proxy = require('./routes/proxy');
 var app = express();
 
@@ -22,6 +22,10 @@ function getMozEcName(weburl, number, callback) {
     });
 }
 
+//加载模板引擎ejs
+app.set('views', ['./views']);
+app.set('view engine', 'ejs');
+
 //静态文件处理
 app.use('/static', express.static('./public'));
 
@@ -29,7 +33,10 @@ app.use('/static', express.static('./public'));
 app.use('/user', users);
 
 app.get('/', function(req, res) {
-    res.send('hello world');
+    res.render('index', {
+        user: 'xiaobao',
+        message: 'welcome to this system'
+    });
 });
 
 app.get('/proxy', function(req, res) {
@@ -47,7 +54,7 @@ app.get('/proxy', function(req, res) {
             });
         });
     });
-})
+});
 
 app.listen(3000, function() {
     console.log('server starts');
