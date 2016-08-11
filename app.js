@@ -1,5 +1,6 @@
 var express = require('express'),
     url = require('url'),
+    async = require('async'),
     users = require('./routes/users'),
     proxy = require('./routes/proxy');
 var app = express();
@@ -44,13 +45,19 @@ app.get('/proxy', function(req, res) {
         hostname = weburlObj.hostname;
     proxy.getProxy(weburl, function(data) {
         var scripts = data.match(/<script type=\"text\/javascript\" charset=\"utf-8\" src=\"(.*?)\"><\/script>/g);
-        var scriptUrl = scripts[0].match(/<script type=\"text\/javascript\" charset=\"utf-8\" src=\"(.*?)\"><\/script>/)[1];
-        getMozEcName(protocol + '//' + hostname + scriptUrl, 0, function() {
-            var scriptUrl = scripts[1].match(/<script type=\"text\/javascript\" charset=\"utf-8\" src=\"(.*?)\"><\/script>/)[1];
-            getMozEcName(protocol + '//' + hostname + scriptUrl, 1, function() {
-                res.end('proxy finish');
+        var scriptUrls = [];
+        for (var i = 0; i < scripts.length; i++) {
+            scriptUrls.push(scripts[i].match(/<script type=\"text\/javascript\" charset=\"utf-8\" src=\"(.*?)\"><\/script>/)[1]);
+        }
+        async.eachSeries(scriptUrls, function(scriptUrl, callback) {
+            var number = scriptUrls.indexOf(scriptUrl);
+            getMozEcName(protocol + '//' + hostname + scriptUrl, number, function() {
+                callback(null);
             });
-        });
+        }, function(err) {
+            res.end('hello world');
+        })
+        res.end('hello world');
     });
 });
 
